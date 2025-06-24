@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.MovieScreen
+import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.movie_user.MovieUserScreen
 import com.technonext.androidjetcakcomposemvihiltpagination.ui.theme.AndroidJetcakComposeMVIHiltPaginationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,7 +25,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MovieScreen()
+                    //MovieScreen()
+                    MovieUserScreen()
                 }
             }
         }
