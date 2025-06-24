@@ -21,7 +21,6 @@ enum class ScreenTab {
     MOVIES, USERS
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieUserScreen(
     viewModel: MovieAndUserViewModel = hiltViewModel()
