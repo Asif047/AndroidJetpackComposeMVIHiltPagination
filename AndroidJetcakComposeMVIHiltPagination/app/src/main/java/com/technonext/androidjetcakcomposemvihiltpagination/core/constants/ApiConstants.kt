@@ -16,4 +16,7 @@ object ApiConstants {
     // Default Values
     const val DEFAULT_PAGE = 1
     const val DEFAULT_LANGUAGE = "en-US"
+
+    const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
+    const val IMAGE_BASE_URL_ORIGINAL = "https://image.tmdb.org/t/p/original"
 }

@@ -1,12 +1,31 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.domain.model
 
+import com.technonext.androidjetcakcomposemvihiltpagination.core.constants.ApiConstants
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
+
 data class Movie(
     val id: Int,
-    val title: String,
-    val overview: String,
-    val posterPath: String?,
+    val adult: Boolean,
     val backdropPath: String?,
-    val voteAverage: Double,
+    val genreIds: List<Int>,
+    val originalLanguage: String,
+    val originalTitle: String,
+    val overview: String,
+    val popularity: Double,
+    val posterPath: String?,
     val releaseDate: String,
-    val genreIds: List<Int>
-)
+    val title: String,
+    val video: Boolean,
+    val voteAverage: Double,
+    val voteCount: Int
+) {
+    val fullPosterUrl: String
+        get() = if (posterPath != null) {
+            "${ApiConstants.IMAGE_BASE_URL}$posterPath"
+        } else ""
+
+    val fullBackdropUrl: String
+        get() = if (backdropPath != null) {
+            "${ApiConstants.IMAGE_BASE_URL}$backdropPath"
+        } else ""
+}

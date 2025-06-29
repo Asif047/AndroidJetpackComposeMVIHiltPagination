@@ -1,11 +1,10 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.domain.repository
 
+import androidx.paging.PagingData
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.model.Movie
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
-    fun getMovies(): Flow<List<Movie>>
-    suspend fun loadMovies(page: Int): Result<Unit>
-    suspend fun getLastLoadedPage(): Int
-    suspend fun clearMovies()
+    fun getPopularMoviesPaged(): Flow<PagingData<Movie>>
+    fun getAllMovies(): Flow<List<Movie>>
 }

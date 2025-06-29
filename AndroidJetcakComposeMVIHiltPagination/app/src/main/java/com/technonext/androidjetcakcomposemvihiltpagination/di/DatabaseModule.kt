@@ -9,6 +9,7 @@ import androidx.room.Room
 import javax.inject.Singleton
 import android.content.Context
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.dao.MovieDao
+import com.technonext.androidjetcakcomposemvihiltpagination.data.local.dao.RemoteKeysDao
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.database.MovieDatabase
 
 @Module
@@ -26,5 +27,10 @@ object DatabaseModule {
     @Provides
     fun provideMovieDao(database: MovieDatabase): MovieDao {
         return database.movieDao()
+    }
+
+    @Provides
+    fun provideRemoteKeysDao(database: MovieDatabase): RemoteKeysDao {
+        return database.remoteKeysDao()
     }
 }

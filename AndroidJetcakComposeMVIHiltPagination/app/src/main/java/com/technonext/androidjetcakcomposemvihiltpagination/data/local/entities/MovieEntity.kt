@@ -2,15 +2,23 @@ package com.technonext.androidjetcakcomposemvihiltpagination.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+
 @Entity(tableName = "movies")
 data class MovieEntity(
     @PrimaryKey val id: Int,
-    val title: String,
-    val overview: String,
-    val posterPath: String?,
+    val adult: Boolean,
     val backdropPath: String?,
-    val voteAverage: Double,
-    val releaseDate: String,
     val genreIds: String, // JSON string of genre IDs
-    val page: Int
+    val originalLanguage: String,
+    val originalTitle: String,
+    val overview: String,
+    val popularity: Double,
+    val posterPath: String?,
+    val releaseDate: String,
+    val title: String,
+    val video: Boolean,
+    val voteAverage: Double,
+    val voteCount: Int,
+    val page: Int,
+    val insertedAt: Long = System.currentTimeMillis()
 )
