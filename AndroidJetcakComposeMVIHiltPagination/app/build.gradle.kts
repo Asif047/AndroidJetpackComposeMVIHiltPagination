@@ -1,12 +1,12 @@
 import java.util.Properties
 
-        plugins {
-            alias(libs.plugins.android.application)
-            alias(libs.plugins.jetbrains.kotlin.android)
-            alias(libs.plugins.hilt.android)
-            alias(libs.plugins.ksp)
-            alias(libs.plugins.compose.compiler)
-        }
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
+}
 
 android {
     namespace = "com.asif047.androidjetpackcomposemvihiltpagination"
@@ -29,10 +29,12 @@ android {
         debug {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_DEBUG")}\"")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"wss://echo.websocket.org\"")
         }
         release {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_RELEASE")}\"")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"wss://echo.websocket.org\"")
 
             isMinifyEnabled = false
             proguardFiles(
@@ -86,7 +88,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
-    // Network
+    // Network (OkHttp includes WebSocket support)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp)

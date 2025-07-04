@@ -4,6 +4,8 @@ package com.technonext.androidjetcakcomposemvihiltpagination.di
 import com.google.gson.Gson
 import com.technonext.androidjetcakcomposemvihiltpagination.core.config.BuildConfigFields
 import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.data.WebSocketRepositoryImpl
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.domain.WebSocketRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -81,5 +83,11 @@ object NetworkModule {
     @Singleton
     fun provideGson(): Gson {
         return Gson()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWebSocketRepository(okHttpClient: OkHttpClient): WebSocketRepository {
+        return WebSocketRepositoryImpl(okHttpClient)
     }
 }
