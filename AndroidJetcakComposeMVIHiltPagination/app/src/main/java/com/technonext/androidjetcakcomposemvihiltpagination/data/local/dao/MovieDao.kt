@@ -1,7 +1,10 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.data.local.dao
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.entities.MovieEntity
 import kotlinx.coroutines.flow.Flow
 

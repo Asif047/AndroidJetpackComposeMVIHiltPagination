@@ -1,7 +1,6 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.domain.model
 
 import com.technonext.androidjetcakcomposemvihiltpagination.core.constants.ApiConstants
-import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
 
 data class Movie(
     val id: Int,

@@ -4,12 +4,12 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import androidx.room.withTransaction
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.database.MovieDatabase
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.entities.MovieEntity
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.entities.RemoteKeys
-import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
-import androidx.room.withTransaction
 import com.technonext.androidjetcakcomposemvihiltpagination.data.mappers.toEntity
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
 
 @OptIn(ExperimentalPagingApi::class)
 class MovieRemoteMediator(
@@ -31,15 +31,19 @@ class MovieRemoteMediator(
                     val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
                     remoteKeys?.nextKey?.minus(1) ?: 1
                 }
+
                 LoadType.PREPEND -> {
                     val remoteKeys = getRemoteKeyForFirstItem(state)
                     val prevKey = remoteKeys?.prevKey
-                    prevKey ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                    prevKey
+                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 }
+
                 LoadType.APPEND -> {
                     val remoteKeys = getRemoteKeyForLastItem(state)
                     val nextKey = remoteKeys?.nextKey
-                    nextKey ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                    nextKey
+                        ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 }
             }
 

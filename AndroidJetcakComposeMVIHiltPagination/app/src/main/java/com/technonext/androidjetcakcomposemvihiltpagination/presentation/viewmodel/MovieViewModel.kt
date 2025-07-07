@@ -6,7 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.model.Movie
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.usecase.GetPopularMoviesUseCase
-import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.actions.MovieAction
+import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.events.MovieEvent
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.states.MovieState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -23,20 +23,21 @@ class MovieViewModel @Inject constructor(
     private val _state = MutableStateFlow(MovieState())
     val state: StateFlow<MovieState> = _state.asStateFlow()
 
-    val moviesPagingData: Flow<PagingData<Movie>> = getPopularMoviesUseCase()
-        .cachedIn(viewModelScope)
+    val moviesPagingDataFlow: Flow<PagingData<Movie>> =
+        getPopularMoviesUseCase()
+            .cachedIn(viewModelScope)
 
-    fun onAction(action: MovieAction) {
+    fun onAction(action: MovieEvent) {
         when (action) {
-            is MovieAction.LoadMovies -> {
+            is MovieEvent.LoadMovies -> {
                 // Movies are automatically loaded through paging
             }
 
-            is MovieAction.Refresh -> {
-                // Refresh will be handled by SwipeRefresh
+            is MovieEvent.Refresh -> {
+
             }
 
-            is MovieAction.OnMovieClick -> {
+            is MovieEvent.OnMovieClick -> {
                 // Handle movie click navigation
             }
         }

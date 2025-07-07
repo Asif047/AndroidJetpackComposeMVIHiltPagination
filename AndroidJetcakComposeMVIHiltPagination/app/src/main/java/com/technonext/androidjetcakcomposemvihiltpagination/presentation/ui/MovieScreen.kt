@@ -1,55 +1,54 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.technonext.androidjetcakcomposemvihiltpagination.core.common_components.ErrorItem
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.model.Movie
-import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.MovieIntent
-import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.MovieUiEvent
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.MovieViewModel
-import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.actions.MovieAction
+import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.events.MovieEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesScreen(
     viewModel: MovieViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val moviesPagingItems = viewModel.moviesPagingData.collectAsLazyPagingItems()
-
-   // val pullRefreshState = rememberPullToRefreshState()
-
-//    if (pullRefreshState.isRefreshing) {
-//        LaunchedEffect(true) {
-//            moviesPagingItems.refresh()
-//            pullRefreshState.endRefresh()
-//        }
-//    }
+    val moviesPagingItems = viewModel.moviesPagingDataFlow.collectAsLazyPagingItems()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            //.nestedScroll(pullRefreshState.nestedScrollConnection)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -64,7 +63,7 @@ fun MoviesScreen(
                 if (movie != null) {
                     MovieItem(
                         movie = movie,
-                        onClick = { viewModel.onAction(MovieAction.OnMovieClick(movie)) }
+                        onClick = { viewModel.onAction(MovieEvent.OnMovieClick(movie)) }
                     )
                 }
             }
@@ -90,7 +89,8 @@ fun MoviesScreen(
                         item {
                             ErrorItem(
                                 message = error.error.localizedMessage ?: "Unknown error",
-                                onRetry = { retry() }
+                                // Call retry() directly on moviesPagingItems
+                                onRetry = { moviesPagingItems.retry() }
                             )
                         }
                     }
@@ -115,7 +115,7 @@ fun MoviesScreen(
                         item {
                             ErrorItem(
                                 message = error.error.localizedMessage ?: "Unknown error",
-                                onRetry = { retry() }
+                                onRetry = { moviesPagingItems.retry() }
                             )
                         }
                     }
@@ -123,10 +123,17 @@ fun MoviesScreen(
             }
         }
 
-//        PullToRefreshContainer(
-//            state = pullRefreshState,
-//            modifier = Modifier.align(Alignment.TopCenter)
-//        )
+        val uiState by viewModel.state.collectAsState()
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        uiState.error?.let { errorMessage ->
+            // Display a global error message if needed
+        }
     }
 }
 
@@ -208,28 +215,4 @@ fun MovieItem(
     }
 }
 
-@Composable
-fun ErrorItem(
-    message: String,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.error
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
-    }
-}
