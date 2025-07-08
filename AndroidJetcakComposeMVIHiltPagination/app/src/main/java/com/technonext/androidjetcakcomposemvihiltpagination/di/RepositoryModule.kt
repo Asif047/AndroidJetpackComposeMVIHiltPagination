@@ -1,11 +1,11 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.di
 
-import com.google.gson.Gson
-import com.technonext.androidjetcakcomposemvihiltpagination.data.local.dao.MovieDao
+import com.technonext.androidjetcakcomposemvihiltpagination.data.local.database.MovieDatabase
 import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
 import com.technonext.androidjetcakcomposemvihiltpagination.data.repository.MovieRepositoryImpl
+import com.technonext.androidjetcakcomposemvihiltpagination.data.repository.user.UserRepositoryImpl
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.repository.MovieRepository
-import dagger.Binds
+import com.technonext.androidjetcakcomposemvihiltpagination.domain.repository.user.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,10 +14,17 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
+object RepositoryModule {
 
-    @Binds
-    abstract fun bindMovieRepository(
-        movieRepositoryImpl: MovieRepositoryImpl
-    ): MovieRepository
+    @Provides
+    @Singleton
+    fun provideUserRepository(movieApi: MovieApi): UserRepository {
+        return UserRepositoryImpl(movieApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieRepository(movieApi: MovieApi, movieDatabase: MovieDatabase): MovieRepository {
+        return MovieRepositoryImpl(movieApi, movieDatabase)
+    }
 }
