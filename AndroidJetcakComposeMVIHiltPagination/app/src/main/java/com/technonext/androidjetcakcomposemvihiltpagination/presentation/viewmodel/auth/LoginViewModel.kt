@@ -2,6 +2,7 @@ package com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.dto.LoginRequest
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.usecase.auth.LoginUseCase
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.events.auth.LoginEvent
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.viewmodel.states.auth.LoginState
@@ -25,7 +26,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
         }
     }
 
-    private fun login(loginRequest: com.technonext.androidjetcakcomposemvihiltpagination.data.remote.dto.LoginRequest) {
+    private fun login(loginRequest: LoginRequest) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             val result = loginUseCase(loginRequest)
