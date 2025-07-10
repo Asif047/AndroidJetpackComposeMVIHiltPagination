@@ -6,7 +6,7 @@ import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.dto.User
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface MovieApi {
+interface ApiServices {
     @GET(ApiConstants.POPULAR_MOVIES)
     suspend fun getPopularMovies(
         @Query(ApiConstants.QUERY_PAGE) page: Int = ApiConstants.DEFAULT_PAGE,

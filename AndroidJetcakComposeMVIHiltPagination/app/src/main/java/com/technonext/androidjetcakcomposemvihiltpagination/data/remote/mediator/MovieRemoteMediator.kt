@@ -9,11 +9,11 @@ import com.technonext.androidjetcakcomposemvihiltpagination.data.local.database.
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.entities.MovieEntity
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.entities.RemoteKeys
 import com.technonext.androidjetcakcomposemvihiltpagination.data.mappers.toEntity
-import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.ApiServices
 
 @OptIn(ExperimentalPagingApi::class)
 class MovieRemoteMediator(
-    private val movieApi: MovieApi,
+    private val apiServices: ApiServices,
     private val movieDatabase: MovieDatabase
 ) : RemoteMediator<Int, MovieEntity>() {
 
@@ -47,7 +47,7 @@ class MovieRemoteMediator(
                 }
             }
 
-            val apiResponse = movieApi.getPopularMovies(
+            val apiResponse = apiServices.getPopularMovies(
                 language = "en-US",
                 page = page
             )

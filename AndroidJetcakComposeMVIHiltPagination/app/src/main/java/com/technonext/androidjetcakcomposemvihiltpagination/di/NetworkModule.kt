@@ -3,7 +3,7 @@ package com.technonext.androidjetcakcomposemvihiltpagination.di
 // di/NetworkModule.kt
 import com.google.gson.Gson
 import com.technonext.androidjetcakcomposemvihiltpagination.core.config.BuildConfigFields
-import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.ApiServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -73,8 +73,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMovieApi(retrofit: Retrofit): MovieApi {
-        return retrofit.create(MovieApi::class.java)
+    fun provideMovieApi(retrofit: Retrofit): ApiServices {
+        return retrofit.create(ApiServices::class.java)
     }
 
     @Provides

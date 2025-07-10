@@ -28,11 +28,13 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_DEBUG")}\"")
-            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
+            buildConfigField("String", "BASE_URL", "\"https://dummyjson.com/\"")
+            buildConfigField("String", "MOVIE_BASE_URL", "\"https://api.themoviedb.org/3/\"")
         }
         release {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_RELEASE")}\"")
-            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
+            buildConfigField("String", "BASE_URL", "\"https://dummyjson.com/\"")
+            buildConfigField("String", "MOVIE_BASE_URL", "\"https://api.themoviedb.org/3/\"")
 
             isMinifyEnabled = false
             proguardFiles(

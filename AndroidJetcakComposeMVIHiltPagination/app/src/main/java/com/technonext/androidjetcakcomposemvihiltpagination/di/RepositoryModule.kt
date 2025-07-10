@@ -1,7 +1,10 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.di
 
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.AuthApiServices
+import com.technonext.androidjetcakcomposemvihiltpagination.data.repository.auth.AuthRepositoryImpl
+import com.technonext.androidjetcakcomposemvihiltpagination.domain.repository.auth.AuthRepository
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.database.MovieDatabase
-import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.ApiServices
 import com.technonext.androidjetcakcomposemvihiltpagination.data.repository.MovieRepositoryImpl
 import com.technonext.androidjetcakcomposemvihiltpagination.data.repository.user.UserRepositoryImpl
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.repository.MovieRepository
@@ -18,13 +21,19 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(movieApi: MovieApi): UserRepository {
-        return UserRepositoryImpl(movieApi)
+    fun provideUserRepository(apiServices: ApiServices): UserRepository {
+        return UserRepositoryImpl(apiServices)
     }
 
     @Provides
     @Singleton
-    fun provideMovieRepository(movieApi: MovieApi, movieDatabase: MovieDatabase): MovieRepository {
-        return MovieRepositoryImpl(movieApi, movieDatabase)
+    fun provideAuthRepository(authApiServices: AuthApiServices): AuthRepository {
+        return AuthRepositoryImpl(authApiServices)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieRepository(apiServices: ApiServices, movieDatabase: MovieDatabase): MovieRepository {
+        return MovieRepositoryImpl(apiServices, movieDatabase)
     }
 }

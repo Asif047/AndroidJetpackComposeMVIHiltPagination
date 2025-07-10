@@ -7,7 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.technonext.androidjetcakcomposemvihiltpagination.data.local.database.MovieDatabase
 import com.technonext.androidjetcakcomposemvihiltpagination.data.mappers.toDomain
-import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.MovieApi
+import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.api.ApiServices
 import com.technonext.androidjetcakcomposemvihiltpagination.data.remote.mediator.MovieRemoteMediator
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.model.Movie
 import com.technonext.androidjetcakcomposemvihiltpagination.domain.repository.MovieRepository
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 @OptIn(ExperimentalPagingApi::class)
 @Singleton
 class MovieRepositoryImpl @Inject constructor(
-    private val movieApi: MovieApi,
+    private val apiServices: ApiServices,
     private val movieDatabase: MovieDatabase
 ) : MovieRepository {
 
@@ -31,7 +31,7 @@ class MovieRepositoryImpl @Inject constructor(
                 prefetchDistance = 3
             ),
             remoteMediator = MovieRemoteMediator(
-                movieApi = movieApi,
+                apiServices = apiServices,
                 movieDatabase = movieDatabase
             ),
             pagingSourceFactory = {
