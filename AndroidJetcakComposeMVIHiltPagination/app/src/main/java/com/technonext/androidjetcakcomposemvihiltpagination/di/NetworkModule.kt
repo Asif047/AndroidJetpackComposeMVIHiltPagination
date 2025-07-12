@@ -29,7 +29,7 @@ object NetworkModule {
             val originalHttpUrl = original.url
 
             val url = originalHttpUrl.newBuilder()
-                .addQueryParameter("api_key", BuildConfigFields.API_KEY)
+                //.addQueryParameter("api_key", BuildConfigFields.API_KEY)
                 .build()
 
             val requestBuilder = original.newBuilder()
@@ -87,7 +87,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideWebSocketRepository(okHttpClient: OkHttpClient): WebSocketRepository {
-        return WebSocketRepositoryImpl(okHttpClient)
+    fun provideWebSocketRepository(): WebSocketRepository {
+        return WebSocketRepositoryImpl()
     }
 }

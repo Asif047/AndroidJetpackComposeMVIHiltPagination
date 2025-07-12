@@ -29,12 +29,12 @@ android {
         debug {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_DEBUG")}\"")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-            buildConfigField("String", "WEBSOCKET_URL", "\"wss://echo.websocket.org\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"ws://10.70.33.241:8080/ws\"")
         }
         release {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_RELEASE")}\"")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-            buildConfigField("String", "WEBSOCKET_URL", "\"wss://echo.websocket.org\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"ws://10.70.33.241:8080/ws\"")
 
             isMinifyEnabled = false
             proguardFiles(
@@ -93,6 +93,9 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 
     // Database
     implementation(libs.room.runtime)

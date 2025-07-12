@@ -9,6 +9,7 @@ interface WebSocketRepository {
 
     suspend fun connect()
     suspend fun disconnect()
-    suspend fun sendMessage(message: String)
+    suspend fun sendMessage(destination: String, message: String)
+    fun subscribeToTopic(topic: String): Flow<String>
     fun isConnected(): Boolean
 }

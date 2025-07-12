@@ -38,12 +38,17 @@ class WebSocketViewModel @Inject constructor(
                         "Failed to connect to WebSocket"
                     } else null
                 )
+
+                if (status == WebSocketConnectionStatus.CONNECTED) {
+                    subscribeToMessages()
+                }
             }
         }
+    }
 
-        // Observe messages
+    private fun subscribeToMessages() {
         viewModelScope.launch {
-            webSocketRepository.messages.collect { message ->
+            webSocketRepository.subscribeToTopic("/topic/messages").collect { message ->
                 if (message.isNotEmpty()) {
                     val newMessage = ChatMessage(
                         message = message,
@@ -99,7 +104,7 @@ class WebSocketViewModel @Inject constructor(
                             )
 
                             // Send the message via WebSocket
-                            webSocketRepository.sendMessage(intent.message)
+                            webSocketRepository.sendMessage("/app/send", intent.message)
                         } catch (e: Exception) {
                             _state.value = _state.value.copy(
                                 errorMessage = "Failed to send message: ${e.message}"

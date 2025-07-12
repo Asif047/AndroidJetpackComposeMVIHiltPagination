@@ -5,123 +5,72 @@ import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.WebSocket
 import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.domain.WebSocketRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import okhttp3.*
-import okio.ByteString
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.StompClient
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WebSocketRepositoryImpl @Inject constructor(
-    private val okHttpClient: OkHttpClient
-) : WebSocketRepository {
+class WebSocketRepositoryImpl @Inject constructor() : WebSocketRepository {
 
-    private var webSocket: WebSocket? = null
+    private var stompClient: StompClient? = null
     private val _connectionStatus = MutableStateFlow(WebSocketConnectionStatus.DISCONNECTED)
-    private val _messages = MutableStateFlow("")
+    private val _messages = MutableSharedFlow<String>()
 
     override val connectionStatus: StateFlow<WebSocketConnectionStatus> = _connectionStatus
-    override val messages: Flow<String> = callbackFlow {
-        val listener = object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                super.onOpen(webSocket, response)
-                _connectionStatus.value = WebSocketConnectionStatus.CONNECTED
-            }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                super.onMessage(webSocket, text)
-                trySend(text)
-            }
-
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                super.onMessage(webSocket, bytes)
-                trySend(bytes.utf8())
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                super.onClosing(webSocket, code, reason)
-                _connectionStatus.value = WebSocketConnectionStatus.DISCONNECTED
-                webSocket.close(1000, null)
-            }
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                super.onClosed(webSocket, code, reason)
-                _connectionStatus.value = WebSocketConnectionStatus.DISCONNECTED
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                super.onFailure(webSocket, t, response)
-                _connectionStatus.value = WebSocketConnectionStatus.ERROR
-            }
-        }
-
-        this@WebSocketRepositoryImpl.webSocket?.let {
-            // If we already have a WebSocket, add the listener
-            // Note: This is a simplified approach. In a real app, you might want to handle this differently
-        }
-
-        awaitClose {
-            // Cleanup if needed
-        }
-    }
+    override val messages: Flow<String> = _messages
 
     override suspend fun connect() {
-        if (webSocket != null) {
-            disconnect()
+        if (stompClient != null && stompClient!!.isConnected) {
+            return
         }
 
         _connectionStatus.value = WebSocketConnectionStatus.CONNECTING
 
-        val request = Request.Builder()
-            .url(BuildConfig.WEBSOCKET_URL)
-            .build()
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, BuildConfig.WEBSOCKET_URL)
 
-        val listener = object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                super.onOpen(webSocket, response)
-                _connectionStatus.value = WebSocketConnectionStatus.CONNECTED
+        stompClient?.connect()
+
+        stompClient?.lifecycle()
+            ?.subscribe {
+                when (it.type) {
+                    ua.naiksoftware.stomp.dto.LifecycleEvent.Type.OPENED -> {
+                        _connectionStatus.value = WebSocketConnectionStatus.CONNECTED
+                    }
+                    ua.naiksoftware.stomp.dto.LifecycleEvent.Type.ERROR -> {
+                        _connectionStatus.value = WebSocketConnectionStatus.ERROR
+                    }
+                    ua.naiksoftware.stomp.dto.LifecycleEvent.Type.CLOSED -> {
+                        _connectionStatus.value = WebSocketConnectionStatus.DISCONNECTED
+                    }
+                    else -> {}
+                }
             }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                super.onMessage(webSocket, text)
-                _messages.value = text
-            }
-
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                super.onMessage(webSocket, bytes)
-                _messages.value = bytes.utf8()
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                super.onClosing(webSocket, code, reason)
-                _connectionStatus.value = WebSocketConnectionStatus.DISCONNECTED
-                webSocket.close(1000, null)
-            }
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                super.onClosed(webSocket, code, reason)
-                _connectionStatus.value = WebSocketConnectionStatus.DISCONNECTED
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                super.onFailure(webSocket, t, response)
-                _connectionStatus.value = WebSocketConnectionStatus.ERROR
-            }
-        }
-
-        webSocket = okHttpClient.newWebSocket(request, listener)
     }
 
     override suspend fun disconnect() {
-        webSocket?.close(1000, "User disconnected")
-        webSocket = null
+        stompClient?.disconnect()
+        stompClient = null
         _connectionStatus.value = WebSocketConnectionStatus.DISCONNECTED
     }
 
-    override suspend fun sendMessage(message: String) {
-        webSocket?.send(message)
+    override suspend fun sendMessage(destination: String, message: String) {
+        stompClient?.send(destination, message)?.subscribe()
+    }
+
+    override fun subscribeToTopic(topic: String): Flow<String> {
+        return callbackFlow {
+            val topicSubscription = stompClient?.topic(topic)?.subscribe {
+                trySend(it.payload)
+            }
+            awaitClose {
+                topicSubscription?.dispose()
+            }
+        }
     }
 
     override fun isConnected(): Boolean {
