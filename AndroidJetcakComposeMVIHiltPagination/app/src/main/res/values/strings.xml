@@ -1,3 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <resources>
     <string name="app_name">AndroidJetcakComposeMVIHiltPagination</string>
+    <string name="select_language">Select Language</string>
+    <string name="english">English</string>
+    <string name="bangla">বাংলা</string>
+    <string name="welcome_message">Welcome to our app!</string>
+    <string name="current_language">Current Language: English</string>
+    <string name="change_language">Change Language</string>
+    <string name="home_screen">Home Screen</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -117,6 +117,8 @@ dependencies {
     // Image Loading
     implementation(libs.coil.compose)
 
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
     // Debug
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

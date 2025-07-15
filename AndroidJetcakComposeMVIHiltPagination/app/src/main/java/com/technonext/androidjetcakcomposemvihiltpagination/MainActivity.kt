@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.technonext.androidjetcakcomposemvihiltpagination.presentation.home.HomeScreen
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.MoviesScreen
 import com.technonext.androidjetcakcomposemvihiltpagination.ui.theme.AndroidJetcakComposeMVIHiltPaginationTheme
 import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.presentation.WebSocketTestScreen
@@ -27,7 +28,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     //MoviesScreen()
                     //MovieUserScreen()
-                    WebSocketTestScreen()
+                    //WebSocketTestScreen()
+                    HomeScreen()
                 }
             }
         }

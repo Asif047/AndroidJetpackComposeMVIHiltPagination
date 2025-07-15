@@ -3,5 +3,5 @@ package com.technonext.androidjetcakcomposemvihiltpagination
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp
-class MovieApp : Application()
+//@HiltAndroidApp
+//class MovieApp : Application()
