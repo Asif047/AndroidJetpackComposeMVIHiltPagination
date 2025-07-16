@@ -26,24 +26,25 @@ fun HomeScreen() {
     var selectedLanguage by remember {
         mutableStateOf(languageManager.getLanguage())
     }
-    var showLanguageDialog by remember { mutableStateOf(false) }
 
-    
-
-    // Update selected language when the screen is composed
+    // Update selected language on first composition
     LaunchedEffect(Unit) {
         selectedLanguage = languageManager.getLanguage()
         Log.d("HomeScreen", "Current language: $selectedLanguage")
     }
 
+    val languages = listOf(
+        LanguageManager.LANGUAGE_ENGLISH to stringResource(id = R.string.english),
+        LanguageManager.LANGUAGE_BANGLA to stringResource(id = R.string.bangla)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-       // key = recompositionKey // This forces recomposition
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // App Title
+
         Text(
             text = stringResource(id = R.string.app_name),
             fontSize = 28.sp,
@@ -52,7 +53,6 @@ fun HomeScreen() {
             modifier = Modifier.padding(top = 32.dp, bottom = 16.dp)
         )
 
-        // Welcome Message
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,31 +77,59 @@ fun HomeScreen() {
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Language Selection Radio Buttons
+                Text(
+                    text = stringResource(id = R.string.select_language),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Column {
+                    languages.forEach { (code, name) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .selectable(
+                                    selected = selectedLanguage == code,
+                                    onClick = {
+                                        selectedLanguage = code
+                                        languageManager.saveLanguage(code)
+                                        // Restart activity to apply changes
+                                        (context as? Activity)?.let {
+                                            it.finish()
+                                            it.startActivity(it.intent)
+                                        }
+                                    }
+                                ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = selectedLanguage == code,
+                                onClick = {
+                                    selectedLanguage = code
+                                    languageManager.saveLanguage(code)
+                                    (context as? Activity)?.let {
+                                        it.finish()
+                                        it.startActivity(it.intent)
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = name)
+                        }
+                    }
+                }
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Language Selection Button
-        Button(
-            onClick = { showLanguageDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
-        ) {
-            Text(
-                text = stringResource(id = R.string.change_language),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
-            )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Current Language Info
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -129,78 +157,4 @@ fun HomeScreen() {
             }
         }
     }
-
-    // Language Selection Dialog
-    if (showLanguageDialog) {
-        LanguageSelectionDialog(
-            currentLanguage = selectedLanguage,
-            onLanguageSelected = { languageCode ->
-                Log.d("HomeScreen", "Language selected: $languageCode")
-                languageManager.saveLanguage(languageCode)
-                selectedLanguage = languageCode
-                showLanguageDialog = false
-
-                // Force recomposition after language change
-                (context as? Activity)?.let {
-                    it.finish()
-                    it.startActivity(it.intent)
-                }
-            },
-            onDismiss = { showLanguageDialog = false }
-        )
-    }
 }
-
-@Composable
-fun LanguageSelectionDialog(
-    currentLanguage: String,
-    onLanguageSelected: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val languages = listOf(
-        LanguageManager.LANGUAGE_ENGLISH to stringResource(id = R.string.english),
-        LanguageManager.LANGUAGE_BANGLA to stringResource(id = R.string.bangla)
-    )
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(id = R.string.select_language),
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Column {
-                languages.forEach { (code, name) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = currentLanguage == code,
-                                onClick = { onLanguageSelected(code) }
-                            )
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = currentLanguage == code,
-                            onClick = { onLanguageSelected(code) }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = name,
-                            fontSize = 16.sp
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK")
-            }
-        }
-    )
-}
-
