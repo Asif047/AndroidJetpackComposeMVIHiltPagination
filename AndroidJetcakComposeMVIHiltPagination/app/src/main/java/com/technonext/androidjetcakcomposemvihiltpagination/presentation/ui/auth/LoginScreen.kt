@@ -42,11 +42,11 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        if (DeveloperOptionsUtils.isDeveloperOptionsEnabled(context)) {
-            showDialog = true
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        if (DeveloperOptionsUtils.isDeveloperOptionsEnabled(context)) {
+//            showDialog = true
+//        }
+//    }
 
     if (showDialog) {
         DeveloperOptionsDialog(

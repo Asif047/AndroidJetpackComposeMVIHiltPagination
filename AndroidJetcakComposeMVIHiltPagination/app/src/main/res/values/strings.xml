@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AndroidJetcakComposeMVIHiltPagination</string>
+    <string name="greeting">Hello</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="english">English</string>
+    <string name="bangla">Bangla</string>
 </resources>

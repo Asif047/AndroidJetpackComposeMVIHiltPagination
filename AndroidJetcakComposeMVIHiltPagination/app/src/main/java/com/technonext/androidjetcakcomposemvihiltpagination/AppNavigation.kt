@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.auth.LoginScreen
+import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.components.homescreen.LanguageSwitcher
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.home.HomeScreen
 
 @Composable
@@ -16,6 +17,7 @@ fun AppNavigation() {
         }
         composable("home") {
             HomeScreen()
+            LanguageSwitcher()
         }
     }
 }
