@@ -29,9 +29,10 @@ class LanguageManager(private val context: Context) {
 
     fun setLocale(languageCode: String) {
         val locale = Locale(languageCode)
-        val localeList = LocaleListCompat.forLanguageTags(languageCode)
+        val localeList = LocaleListCompat.create(locale)
         AppCompatDelegate.setApplicationLocales(localeList)
     }
+
 
     fun getCurrentLocale(): Locale {
         val languageCode = getLanguage()

@@ -1,8 +1,10 @@
 package com.technonext.androidjetcakcomposemvihiltpagination
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,6 +36,19 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
+    override fun attachBaseContext(newBase: Context) {
+        val locale = AppCompatDelegate.getApplicationLocales()[0]
+        val context = newBase.createConfigurationContext(
+            newBase.resources.configuration.apply {
+                setLocale(locale)
+            }
+        )
+        super.attachBaseContext(context)
+    }
+
+
 }
 
 @Composable

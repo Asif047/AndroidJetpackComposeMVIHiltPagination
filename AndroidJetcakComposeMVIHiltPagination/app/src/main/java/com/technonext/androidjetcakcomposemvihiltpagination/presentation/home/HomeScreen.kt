@@ -1,5 +1,6 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.presentation.home
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -14,25 +15,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.asif047.androidjetpackcomposemvihiltpagination.R
-import com.technonext.androidjetcakcomposemvihiltpagination.utils.LanguageChangeHelper
+import com.technonext.androidjetcakcomposemvihiltpagination.utils.LanguageManager
 
 
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
-    val languageHelper = remember { LanguageChangeHelper() }
+    val languageManager = remember { LanguageManager(context) }
 
     var selectedLanguage by remember {
-        mutableStateOf(languageHelper.getLanguageCode(context))
+        mutableStateOf(languageManager.getLanguage())
     }
     var showLanguageDialog by remember { mutableStateOf(false) }
 
-    // Force recomposition when language changes
-    var recompositionKey by remember { mutableStateOf(0) }
+    
 
     // Update selected language when the screen is composed
     LaunchedEffect(Unit) {
-        selectedLanguage = languageHelper.getLanguageCode(context)
+        selectedLanguage = languageManager.getLanguage()
         Log.d("HomeScreen", "Current language: $selectedLanguage")
     }
 
@@ -136,12 +136,15 @@ fun HomeScreen() {
             currentLanguage = selectedLanguage,
             onLanguageSelected = { languageCode ->
                 Log.d("HomeScreen", "Language selected: $languageCode")
-                languageHelper.changeLanguage(context, languageCode)
+                languageManager.saveLanguage(languageCode)
                 selectedLanguage = languageCode
                 showLanguageDialog = false
 
                 // Force recomposition after language change
-                recompositionKey++
+                (context as? Activity)?.let {
+                    it.finish()
+                    it.startActivity(it.intent)
+                }
             },
             onDismiss = { showLanguageDialog = false }
         )
@@ -155,8 +158,8 @@ fun LanguageSelectionDialog(
     onDismiss: () -> Unit
 ) {
     val languages = listOf(
-        LanguageChangeHelper.LANGUAGE_ENGLISH to stringResource(id = R.string.english),
-        LanguageChangeHelper.LANGUAGE_BANGLA to stringResource(id = R.string.bangla)
+        LanguageManager.LANGUAGE_ENGLISH to stringResource(id = R.string.english),
+        LanguageManager.LANGUAGE_BANGLA to stringResource(id = R.string.bangla)
     )
 
     AlertDialog(
