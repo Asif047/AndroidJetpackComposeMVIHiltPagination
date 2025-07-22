@@ -1,0 +1,119 @@
+package com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.presentation
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.WebSocketConnectionStatus
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.domain.PrivateMessageRepository
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.domain.model.PrivateMessageIntent
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.domain.model.PrivateMessageState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class PrivateMessageViewModel @Inject constructor(
+    private val privateMessageRepository: PrivateMessageRepository
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(PrivateMessageState())
+    val state: StateFlow<PrivateMessageState> = _state.asStateFlow()
+
+    init {
+        // Observe connection status
+        viewModelScope.launch {
+            privateMessageRepository.connectionStatus.collect { status ->
+                _state.value = _state.value.copy(
+                    isConnected = status == WebSocketConnectionStatus.CONNECTED,
+                    isConnecting = status == WebSocketConnectionStatus.CONNECTING,
+                    connectionStatus = when (status) {
+                        WebSocketConnectionStatus.CONNECTING -> "Connecting..."
+                        WebSocketConnectionStatus.CONNECTED -> "Connected"
+                        WebSocketConnectionStatus.DISCONNECTED -> "Disconnected"
+                        WebSocketConnectionStatus.ERROR -> "Connection Error"
+                    },
+                    errorMessage = if (status == WebSocketConnectionStatus.ERROR) {
+                        "Failed to connect to WebSocket"
+                    } else null
+                )
+            }
+        }
+
+        // Observe messages
+        viewModelScope.launch {
+            privateMessageRepository.messages.collect { messages ->
+                _state.value = _state.value.copy(messages = messages)
+            }
+        }
+    }
+
+    fun handleIntent(intent: PrivateMessageIntent) {
+        when (intent) {
+            is PrivateMessageIntent.Connect -> {
+                viewModelScope.launch {
+                    try {
+                        if (intent.username.isNotBlank()) {
+                            _state.value = _state.value.copy(username = intent.username)
+                            privateMessageRepository.connect(intent.username)
+                        }
+                    } catch (e: Exception) {
+                        _state.value = _state.value.copy(
+                            errorMessage = "Failed to connect: ${e.message}"
+                        )
+                    }
+                }
+            }
+
+            is PrivateMessageIntent.Disconnect -> {
+                viewModelScope.launch {
+                    try {
+                        privateMessageRepository.disconnect()
+                    } catch (e: Exception) {
+                        _state.value = _state.value.copy(
+                            errorMessage = "Failed to disconnect: ${e.message}"
+                        )
+                    }
+                }
+            }
+
+            is PrivateMessageIntent.SendMessage -> {
+                if (intent.message.isNotBlank() && intent.receiverName.isNotBlank()) {
+                    viewModelScope.launch {
+                        try {
+                            privateMessageRepository.sendPrivateMessage(intent.receiverName, intent.message)
+                        } catch (e: Exception) {
+                            _state.value = _state.value.copy(
+                                errorMessage = "Failed to send message: ${e.message}"
+                            )
+                        }
+                    }
+                }
+            }
+
+            is PrivateMessageIntent.ClearMessages -> {
+                privateMessageRepository.clearMessages()
+            }
+
+            is PrivateMessageIntent.ClearError -> {
+                _state.value = _state.value.copy(errorMessage = null)
+            }
+
+            is PrivateMessageIntent.SetReceiver -> {
+                _state.value = _state.value.copy(receiverName = intent.receiverName)
+            }
+
+            is PrivateMessageIntent.SetUsername -> {
+                _state.value = _state.value.copy(username = intent.username)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch {
+            privateMessageRepository.disconnect()
+        }
+    }
+}
