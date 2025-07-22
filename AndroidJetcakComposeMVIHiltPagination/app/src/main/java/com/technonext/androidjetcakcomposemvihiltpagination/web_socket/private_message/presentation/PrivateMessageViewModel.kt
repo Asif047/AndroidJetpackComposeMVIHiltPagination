@@ -1,5 +1,6 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.WebSocketConnectionStatus
@@ -10,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,28 +26,35 @@ class PrivateMessageViewModel @Inject constructor(
     init {
         // Observe connection status
         viewModelScope.launch {
-            privateMessageRepository.connectionStatus.collect { status ->
-                _state.value = _state.value.copy(
-                    isConnected = status == WebSocketConnectionStatus.CONNECTED,
-                    isConnecting = status == WebSocketConnectionStatus.CONNECTING,
-                    connectionStatus = when (status) {
-                        WebSocketConnectionStatus.CONNECTING -> "Connecting..."
-                        WebSocketConnectionStatus.CONNECTED -> "Connected"
-                        WebSocketConnectionStatus.DISCONNECTED -> "Disconnected"
-                        WebSocketConnectionStatus.ERROR -> "Connection Error"
-                    },
-                    errorMessage = if (status == WebSocketConnectionStatus.ERROR) {
-                        "Failed to connect to WebSocket"
-                    } else null
-                )
-            }
+            privateMessageRepository.connectionStatus
+                .collect { status ->
+                    Log.d("ViewModel", "Connection status changed to: $status")
+                    _state.value = _state.value.copy(
+                        isConnected = status == WebSocketConnectionStatus.CONNECTED,
+                        isConnecting = status == WebSocketConnectionStatus.CONNECTING,
+                        connectionStatus = when (status) {
+                            WebSocketConnectionStatus.CONNECTING -> "Connecting..."
+                            WebSocketConnectionStatus.CONNECTED -> "Connected"
+                            WebSocketConnectionStatus.DISCONNECTED -> "Disconnected"
+                            WebSocketConnectionStatus.ERROR -> "Connection Error"
+                        },
+                        errorMessage = if (status == WebSocketConnectionStatus.ERROR) {
+                            "Failed to connect to WebSocket"
+                        } else null
+                    )
+                }
         }
 
-        // Observe messages
+        // Observe messages with explicit logging
         viewModelScope.launch {
-            privateMessageRepository.messages.collect { messages ->
-                _state.value = _state.value.copy(messages = messages)
-            }
+            privateMessageRepository.messages
+                .collect { messages ->
+                    Log.d("ViewModel", "Messages updated, count: ${messages.size}")
+                    if (messages.isNotEmpty()) {
+                        Log.d("ViewModel", "Latest message: ${messages.last().message}")
+                    }
+                    _state.value = _state.value.copy(messages = messages)
+                }
         }
     }
 
@@ -55,10 +64,12 @@ class PrivateMessageViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         if (intent.username.isNotBlank()) {
+                            Log.d("ViewModel", "Connecting with username: ${intent.username}")
                             _state.value = _state.value.copy(username = intent.username)
                             privateMessageRepository.connect(intent.username)
                         }
                     } catch (e: Exception) {
+                        Log.e("ViewModel", "Connection failed", e)
                         _state.value = _state.value.copy(
                             errorMessage = "Failed to connect: ${e.message}"
                         )
@@ -69,8 +80,10 @@ class PrivateMessageViewModel @Inject constructor(
             is PrivateMessageIntent.Disconnect -> {
                 viewModelScope.launch {
                     try {
+                        Log.d("ViewModel", "Disconnecting...")
                         privateMessageRepository.disconnect()
                     } catch (e: Exception) {
+                        Log.e("ViewModel", "Disconnect failed", e)
                         _state.value = _state.value.copy(
                             errorMessage = "Failed to disconnect: ${e.message}"
                         )
@@ -82,8 +95,10 @@ class PrivateMessageViewModel @Inject constructor(
                 if (intent.message.isNotBlank() && intent.receiverName.isNotBlank()) {
                     viewModelScope.launch {
                         try {
+                            Log.d("ViewModel", "Sending message to ${intent.receiverName}: ${intent.message}")
                             privateMessageRepository.sendPrivateMessage(intent.receiverName, intent.message)
                         } catch (e: Exception) {
+                            Log.e("ViewModel", "Send message failed", e)
                             _state.value = _state.value.copy(
                                 errorMessage = "Failed to send message: ${e.message}"
                             )
@@ -93,6 +108,7 @@ class PrivateMessageViewModel @Inject constructor(
             }
 
             is PrivateMessageIntent.ClearMessages -> {
+                Log.d("ViewModel", "Clearing messages")
                 privateMessageRepository.clearMessages()
             }
 
@@ -113,7 +129,11 @@ class PrivateMessageViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         viewModelScope.launch {
-            privateMessageRepository.disconnect()
+            try {
+                privateMessageRepository.disconnect()
+            } catch (e: Exception) {
+                Log.e("ViewModel", "Error during cleanup", e)
+            }
         }
     }
 }

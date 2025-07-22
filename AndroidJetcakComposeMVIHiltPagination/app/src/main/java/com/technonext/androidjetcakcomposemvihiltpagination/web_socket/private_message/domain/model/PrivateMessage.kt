@@ -1,7 +1,7 @@
 package com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.domain.model
 
 data class PrivateMessage(
-    val id: String = System.currentTimeMillis().toString(),
+    val id: String? = System.currentTimeMillis().toString(),
     val senderName: String,
     val receiverName: String,
     val message: String,

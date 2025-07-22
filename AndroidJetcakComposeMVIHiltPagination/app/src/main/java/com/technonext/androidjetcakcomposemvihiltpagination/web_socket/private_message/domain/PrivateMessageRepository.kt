@@ -5,12 +5,17 @@ import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_m
 import kotlinx.coroutines.flow.StateFlow
 
 interface PrivateMessageRepository {
+
     val connectionStatus: StateFlow<WebSocketConnectionStatus>
     val messages: StateFlow<List<PrivateMessage>>
 
     suspend fun connect(username: String)
+
     suspend fun disconnect()
+
     suspend fun sendPrivateMessage(receiverName: String, message: String)
+
     fun isConnected(): Boolean
+
     fun clearMessages()
 }
