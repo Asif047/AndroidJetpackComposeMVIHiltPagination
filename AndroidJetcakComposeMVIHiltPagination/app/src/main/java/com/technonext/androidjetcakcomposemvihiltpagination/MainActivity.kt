@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.MoviesScreen
 import com.technonext.androidjetcakcomposemvihiltpagination.ui.theme.AndroidJetcakComposeMVIHiltPaginationTheme
 import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.presentation.WebSocketTestScreen
+import com.technonext.androidjetcakcomposemvihiltpagination.web_socket.private_message.presentation.PrivateMessageScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,7 +28,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     //MoviesScreen()
                     //MovieUserScreen()
-                    WebSocketTestScreen()
+                    //WebSocketTestScreen()
+                    PrivateMessageScreen()
                 }
             }
         }
