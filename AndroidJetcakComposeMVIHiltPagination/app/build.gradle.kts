@@ -29,12 +29,12 @@ android {
         debug {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_DEBUG")}\"")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-            buildConfigField("String", "WEBSOCKET_URL", "\"ws://10.70.33.241:8080/ws\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"ws://10.70.33.241:8092/ws\"")
         }
         release {
             buildConfigField("String", "TMDB_API_KEY", "\"${getApiKey("TMDB_API_KEY_RELEASE")}\"")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-            buildConfigField("String", "WEBSOCKET_URL", "\"ws://10.70.33.241:8080/ws\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"ws://10.70.33.241:8092/ws\"")
 
             isMinifyEnabled = false
             proguardFiles(
