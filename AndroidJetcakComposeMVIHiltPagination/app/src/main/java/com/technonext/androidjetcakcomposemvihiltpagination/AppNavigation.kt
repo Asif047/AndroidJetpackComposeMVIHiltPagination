@@ -8,6 +8,7 @@ import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.auth
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.auth.LoginScreenRoute
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.home.HomeScreen
 import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.user.UserScreen
+import com.technonext.androidjetcakcomposemvihiltpagination.presentation.ui.user.UserScreenRoute
 
 @Composable
 fun AppNavigation() {
@@ -20,7 +21,7 @@ fun AppNavigation() {
             HomeScreen()
         }
         composable("user") {
-            UserScreen()
+            UserScreenRoute()
         }
     }
 }
